@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/html"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="CoSurfGS:Collaborative 3D Surface Gaussian Splatting with Distributed Learning for Large Scene Reconstruction">
+
+        <!--Twitter preview-->
+        <!-- <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="CoSurfGS:Collaborative 3D Surface Gaussian Splatting with Distributed Learning for Large Scene Reconstruction">
+        <meta name="twitter:description" content="NUS&#39; DoGaussian is a distributed method that accelerates 3DGS training with multiple GPU nodes.">
+        <meta name="twitter:image" content="https://aibluefisher.github.io/dogaussian/assets/social_card.png"> -->
+
+        <title>CoSurfGS</title>
+
+        <link href="./assets/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="./assets/all.min.css">
+        <link href="./assets/style.css" rel="stylesheet">
+        
+        <link rel="stylesheet" href="./assets/slider.css">
+        
+        <!-- <link rel="stylesheet" href="./static/css/index.css"> -->
+        <!-- <link rel="stylesheet" href="./static/css/style.css"> -->
+        
+        
+        <link rel="icon" href="./assets/imgs/dog_icon.png">
+        <script src="./static/js/event_handler.js"></script>
+        <script src="./static/js/dics.original.js"></script>
+        <script src="./static/js/video_comparison.js"></script>
+        <script src="./static/js/app.js"></script>
+      
+        <link rel="stylesheet" href="./static/css/dics.original.css">
+        
+    <style type="text/css" abt="234"></style><script>//remove baidu search ad
+var _countAA = 0
+function doBBBd(){}
+doBBBd()
+document.addEventListener('keyup', function(){_countAA-=10;doBBBd()}, false)
+document.addEventListener('click', function(){_countAA-=10;doBBBd()}, false)
+
+</script></head>
+    <body data-new-gr-c-s-check-loaded="14.1173.0" data-gr-ext-installed="">
+
+        <div class="container">
+            <div class="row text-center">
+                <h1 class="mt-3">CoSurfGS: Collaborative 3D Surface Gaussian Splatting with Distributed Learning for Large Scene Reconstruction </h1>
+            </div>
+            <div class="row text-center">
+                <div class="col-sm-0 col-md-2"></div>
+                <div class="col-sm-12 col-md-8">
+                  <h5>
+                        <a href="https://scholar.google.cz/citations?hl=zh-CN&user=1zDq0q8AAAAJ" target="_blank"><nobr>Yuanyuan Gao*<sup>1</sup></nobr></a>  
+                        <a href="https://scholar.google.com/citations?user=6XyNVowAAAAJ&hl=en&oi=ao" target="_blank"><nobr>Yalun Dai*<sup>2</sup></nobr></a>  
+                        <a href="lifuguan.github.io" target="_blank"><nobr>Hao li*<sup>1</sup></nobr></a>  
+                        <a href="https://ywcmaike.github.io/" target="_blank"><nobr>Weicai yei†<sup>3,4</sup></nobr></a>  
+                        <a href="https://github.com/SOTAMak1r" target="_blank"><nobr>Junyi Chen<sup>4</sup></nobr></a>  
+                        <a href="" target="_blank"><nobr>Danpeng Chen<sup>3</sup></nobr></a>  
+                        <a href="https://teacher.nwpu.edu.cn/zdw2006yyy" target="_blank"><nobr>Dingwen Zhang†<sup>1</sup></nobr></a>  
+                        <a href="" target="_blank"><nobr>Tong He<sup>4</sup></nobr></a>  
+                        <a href="" target="_blank"><nobr>Guofeng Zhang<sup>3</sup></nobr></a>  
+                        <a href="" target="_blank"><nobr>Junwei Han<sup>1</sup></nobr></a>  
+                    
+                    <sup>1</sup>Brain and Artificial Intelligence Lab, Northwestern Polytechnical University,</span>
+                    <br>
+                    <sup>2</sup>Nanyang Technological University, <sup>3</sup>Zhejiang University, <sup>4</sup>Shanghai AI Lab, 
+                    <br>
+                    <sup>*</sup>Equal Contributions</span>
+                    <sup>†</sup>Corresponding Authors</span>
+                  </h5>
+                </div>
+                <div class="col-sm-0 col-md-2"></div>
+                <div class="col-md-12 mt-3">
+                    <a href="https://arxiv.org/abs/2412.17612" class="btn btn-secondary btn-sm" target="_blank"><i class="fa-solid fa-file-pdf"></i>&nbsp;&nbsp;arXiv</a>
+                    <a href="" target="_blank" class="btn btn-secondary btn-sm"><i class="fa-brands fa-youtube"></i>&nbsp;&nbsp;Video</a>
+                    <a href="" target="_blank" class="btn btn-secondary btn-sm"><i class="fa-brands fa-github"></i>&nbsp;&nbsp;Code(Coming soon)</a>
+                    <a href="https://gyy456.github.io/CoSurfGS/#citation" class="btn btn-secondary btn-sm"><i class="fa-solid fa-file"></i>&nbsp;&nbsp;BibTeX</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-0 col-md-2"></div>
+                <div class="col-sm-12 col-md-8">
+
+                    <video class="w-100 mt-4" autoplay="" loop="" muted="">
+                        <source src="./assets/videos/final.mp4" type="video/mp4">
+                    </video>
+<!-- 
+                    <iframe src="https://drive.google.com/file/d/1KZ84zTYgJSDZ4Tr62LLMaCm7hc-tp9qx/preview" 
+                    width="640" height="480" allow="autoplay">
+                    </iframe> -->
+
+                    <h3 class="mt-3">Abstract</h3>
+                    <hr>
+                    <p>
+                      3D Gaussian Splatting (3DGS) has demonstrated impressive performance in scene reconstruction. However, 
+                      most existing GS-based surface reconstruction methods focus on 3D objects or limited scenes. Directly 
+                      applying these methods to large-scale scene reconstruction will pose challenges such as high memory 
+                      costs, excessive time consumption, and lack of geometric detail, which makes it difficult to implement 
+                      in practical applications. To address these issues, we propose <b>CoSurfGS</b>, a multi-agent collaborative fast 3DGS 
+                      surface reconstruction framework based on distributed learning for large-scale surface reconstruction. 
+                      Specifically, we develop <b>local model compression (LMC) and model aggregation schemes (MAS)</b>
+                       to achieve high-quality surface representation of large scenes while reducing GPU memory consumption. 
+                       Extensive experiments on Urban3d, MegaNeRF, and BlendedMVS demonstrate that our 
+                      proposed method can achieve fast and scalable high-fidelity surface reconstruction and photorealistic rendering.
+                    </p>
+                    <br> 
+
+                    <div style="text-align: center;">
+                    <img src="./assets/imgs/teaser1_00.png" alt="pipeline" width="90%" >
+                    </div>
+                    <br> 
+                    <p><strong>Fig. 1</strong> 
+                      Our proposed CoSurfGS serves as a ”device-edge-cloud” distributed learning framework that enables multi-agent parallel
+                      training. Under this framework, we can achieve superior large-scene reconstruction performance w.r.t the novel view synthesis, depth
+                      rendering, and surface normal prediction results (see the bottom part). Meanwhile, this framework can also accelerate the whole modeling
+                      process while preserving the privacy of local regions.
+
+
+                    <!-- <h3 class="mt-5" id="overview"> Watch a 3-minute overview video</h3>
+                    <hr class="hr">
+                    <video class="w-100 mb-4" controls="" preload="none" poster="assets/overview_video_poster.jpg">
+                        <source src="" type="video/mp4">
+                    </video> -->
+
+
+
+
+                    <h3 class="mt-5"><b>CorSurfGS</b> Mesh Visualization</h3>
+                    <hr class="hr">
+                    <p>
+                        We visualize the surface reconstruction results of <b>CoSurfGS</b> on the BlendedMVS compared with NeUS and BakedAngelo.
+                        <b>Use the controls to switch between scenes.</b>
+                    </p>
+
+                    <div id="CoSurfGS" class="carousel slide" data-bs-ride="false">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#CoSurfGS" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#CoSurfGS" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#CoSurfGS" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        </div>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <video class="w-100" autoplay="" loop="" muted="">
+                                    <source src="./assets/videos/new_details/cosurf.mp4" type="video/mp4">
+                                </video>
+                                <div class="carousel-caption">
+                                    <h5>CorSurfGS</h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <video class="w-100" autoplay="" loop="" muted="">
+                                    <source src="./assets/videos/new_details/neus.mp4" type="video/mp4">
+                                </video>
+                                <div class="carousel-caption">
+                                    <h5>NeUS</h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <video class="w-100" autoplay="" loop="" muted="">
+                                    <source src="./assets/videos/new_details/bakemp4.mp4" type="video/mp4">
+                                </video>
+                                <div class="carousel-caption">
+                                    <h5>BakedAngelo</h5>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#CoSurfGS" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#CoSurfGS" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+
+                    
+                    <h3 class="mt-5"><b>LMC and MAS Module</h3>
+                    <hr class="hr">
+
+                    <p>
+                      <b>LMC module prune the Gaussian points lacking multi-geometry.</b>
+                    </p>
+
+                    <div id="LMC" class="carousel slide" data-bs-ride="false">
+                      <div class="carousel-indicators">
+                          <button type="button" data-bs-target="#LMC" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                          <button type="button" data-bs-target="#LMC" data-bs-slide-to="1" aria-label="Slide 1"></button>
+                      </div>
+                      <div class="carousel-inner">
+                          <div class="carousel-item active">
+                              <video class="w-100" autoplay="" loop="" muted="">
+                                  <source src="./assets/videos/LMC/w/87cq1-y5u1j.mp4" type="video/mp4">
+                              </video>
+                              <div class="carousel-caption">
+                                  <h5>With LMC</h5>
+                              </div>
+                          </div>
+                          <div class="carousel-item">
+                              <video class="w-100" autoplay="" loop="" muted="">
+                                  <source src="./assets/videos/LMC/wo/6g8t5-nwweu.mp4" type="video/mp4">
+                              </video>
+                              <div class="carousel-caption">
+                                  <h5>Without LMC</h5>
+                              </div>
+                          </div>
+                        </div>
+                      <button class="carousel-control-prev" type="button" data-bs-target="#LMC" data-bs-slide="prev">
+                          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                          <span class="visually-hidden">Previous</span>
+                      </button>
+                      <button class="carousel-control-next" type="button" data-bs-target="#LMC" data-bs-slide="next">
+                          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                          <span class="visually-hidden">Next</span>
+                      </button>
+                    </div>
+
+                    
+                    <p>
+                      <b>MAS module uses a self-distallation methold to resolve boundary blurring.</b> 
+                    </p>
+
+                    <div id="MAS" class="carousel slide" data-bs-ride="false">
+                      <div class="carousel-indicators">
+                          <button type="button" data-bs-target="#MAS" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                          <button type="button" data-bs-target="#MAS" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                      </div>
+                      <div class="carousel-inner">
+                          <div class="carousel-item active">
+                              <video class="w-100" autoplay="" loop="" muted="">
+                                  <source src="./assets/videos/MAS/w/8h22j-wxlwq.mp4" type="video/mp4">
+                              </video>
+                              <div class="carousel-caption">
+                                  <h5>With MAS</h5>
+                              </div>
+                          </div>
+                          <div class="carousel-item">
+                              <video class="w-100" autoplay="" loop="" muted="">
+                                  <source src="./assets/videos/MAS/wo/xjq60-kw2th.mp4" type="video/mp4">
+                              </video>
+                              <div class="carousel-caption">
+                                  <h5>Without MAS</h5>
+                              </div>
+                          </div>
+                          
+                      </div>
+                      <button class="carousel-control-prev" type="button" data-bs-target="#MAS" data-bs-slide="prev">
+                          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                          <span class="visually-hidden">Previous</span>
+                      </button>
+                      <button class="carousel-control-next" type="button" data-bs-target="#MAS" data-bs-slide="next">
+                          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                          <span class="visually-hidden">Next</span>
+                      </button>
+                    </div>
+
+
+                    <h3 class="mt-5"><b>CoSurfGS</b> on novel view synthesis</h3>
+                    <hr class="hr">
+                    <section class="section">
+                      <div class="container is-max-desktop">
+                    
+                        <div class="columns is-centered has-text-centered">
+                          <!-- <h2 class="title is-3">Comparison</h2>       -->
+                        </div>
+                    
+                    
+                        
+                    
+                    
+                    
+                    
+                    
+                        <div class="content has-text-justified">
+                          We present the qualitative comparison RGB results of Ground Truth, CosurfGS (Ours), SuGaR and Neuralangelo.
+                        </div>
+                    
+                        <br>
+                            
+                    
+                            <div class="row">
+                            <div class="container is-max-desktop">
+                    
+                                    <div class="container">
+                                        <ul class="nav nav-tabs nav-fill nav-justified" id="object-scale-recon">
+                                            <li class="nav-item">
+                                                <a class="nav-link" onclick="objectSceneEvent(0)">sci-art</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" onclick="objectSceneEvent(1)">residence</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" onclick="objectSceneEvent(2)">campus</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link  active" onclick="objectSceneEvent(3)">rubble</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" onclick="objectSceneEvent(4)">building</a>
+                                            </li>
+                                        </ul>
+                                        <div class="b-dics" style="width: 2600px; font-weight: 800;">
+                                            <img src="resources/render/rubble/gt.png" alt="GT">
+                                            <img src="resources/render/rubble/ours.png" alt="Ours">
+                                            <img src="resources/render/rubble/sugar.png" alt="SuGaR">
+                                            <!-- <img src="resources/render/rubble/neus.png" alt="Neus"> -->
+                                            <img src="resources/render/rubble/neuralangelo.png" alt="Neuralangelo">
+                                        </div>
+                                    </div>               
+                                </div>
+                                <!-- </div> -->
+                                <!-- </div> -->
+                            </div>
+                    
+                        <!-- <div class="columns is-centered has-text-centered">
+                          <div class="column">
+                            <div class="columns is-centered has-text-centered">
+                              <div class="column content">
+                                <video id="matting-video" autoplay muted loop playsinline width="100%">
+                                  <source src="sources/videos/results.mp4"
+                                          type="video/mp4">
+                                </video>
+                              </div>
+                            </div>
+                          </div>
+                        </div> -->
+                    
+                        <br>
+                        <div class="content has-text-justified">
+                          We present the qualitative comparison depth results of CosurfGS (Ours), SuGaR and Neuralangelo.
+                        </div>
+                    
+                            <div class="row">
+                            <div class="container is-max-desktop">
+                                <!-- <div class="col-md-8 col-md-offset-2"> -->
+                                <!-- <div class="columns is-centered ">
+                                <div class="column is-full-width"> -->
+                                    <div class="container">
+                                        <ul class="nav nav-tabs nav-fill nav-justified" id="object-scale-recon-normal">
+                                            <li class="nav-item">
+                                                <a class="nav-link" onclick="objectSceneEventnormal(0)">sci-art</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" onclick="objectSceneEventnormal(1)">residence</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" onclick="objectSceneEventnormal(2)">campus</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link active" onclick="objectSceneEventnormal(3)">rubble</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" onclick="objectSceneEventnormal(4)">building</a>
+                                            </li>
+                                        </ul>
+                                        <div class="b-dics" style="width: 2600px; font-weight: 800;">
+                                            <!-- <img src="resources/normal/building/gt.png" alt="GT"> -->
+                                            <img src="resources/depth/rubble/ours.png" alt="Ours">
+                                            <img src="resources/depth/rubble/sugar.png" alt="SuGaR">
+                                            <img src="resources/depth/rubble/neuralangelo.png" alt="Neuralangelo">
+                                            <!-- <img src="resources/depth/building/neus.png" alt="NeuS"> -->
+                                        </div>
+                                    </div>       
+                                <!-- </div> -->
+                                </div>        
+                            </div>
+                    
+                    
+                    
+                      </div>
+                    </section>
+                    <h3 class="mt-5"><b>CoSurfGS</b> training resources consumption on Mill19 dataset and UrbanScene3D dataset </h3>
+                    <hr class="hr">
+                    
+                    <div style="text-align: center;">
+                      <img src="./assets/imgs/image.png" alt="pipeline" width="90%" >
+                      </div>
+                      <br> 
+                      <p><strong>Fig. 2</strong> 
+                        We present the time (hh: mm), the number
+                        of final points (10<sup>6</sup>), and the allocated memory (GB) during evaluation. For 3DGS-based methods, the overall training time includes the
+                        COLMAP process and training process
+
+
+
+                    <h3 class="mt-5" id="citation">Please consider citing our paper</h3>
+                    <hr class="hr">
+                    <pre class="w-100 user-select-all font-monospace border border-secondary bg-dark mb-5 p-2">@misc{gao2024cosurfgscollaborative,
+                      title={CoSurfGS:Collaborative 3D Surface Gaussian Splatting with Distributed Learning for Large Scene Reconstruction},
+                      author={Yuanyuan Gao and Yalun Dai and Hao Li and Weicai Ye and Junyi Chen and Danpeng Chen and Dingwen Zhang and Tong He and Guofeng Zhang and Junwei Han},
+                      year={2024},
+                      eprint={2412.17612},
+                      archivePrefix={arXiv},
+                      primaryClass={cs.CV}
+                  }</pre>
+
+                </div>
+                <div class="col-sm-0 col-md-2"></div>
+
+
+
+            </div>
+        </div>
+
+        <script src="./assets/bootstrap.bundle.min.js"></script>
+        <script src="https://kit.fontawesome.com/746ee6bfa4.js"></script>
+
+        <script src="./assets/slider.js"></script>
+        <script>
+            new BeforeAfter({
+                id: '#example1'
+            });
+            new BeforeAfter({
+                id: '#example2'
+            });
+            new BeforeAfter({
+                id: '#example3'
+            });
+            new BeforeAfter({
+                id: '#example4'
+            });
+            new BeforeAfter({
+                id: '#example6'
+            });
+            new BeforeAfter({
+                id: '#example7'
+            });
+            new BeforeAfter({
+                id: '#example8'
+            });
+            new BeforeAfter({
+                id: '#example9'
+            });
+        
+        </script>
+
+        <script>
+            window.addEventListener('load', videoScroll);
+            window.addEventListener('scroll', videoScroll);
+
+            function videoScroll() {
+
+                if ( document.querySelectorAll('video[autoplay]').length > 0) {
+
+                    var windowHeight = window.innerHeight,
+                    videoEl = document.querySelectorAll('video[autoplay]');
+
+                    for (var i = 0; i < videoEl.length; i++) {
+
+                        var thisVideoEl = videoEl[i],
+                            videoHeight = thisVideoEl.clientHeight,
+                            videoClientRect = thisVideoEl.getBoundingClientRect().top;
+
+                        if ( (thisVideoEl.parentNode.classList.contains('carousel-item') && thisVideoEl.parentNode.classList.contains('active')) || (thisVideoEl.parentNode.nodeName === 'DIV' && !thisVideoEl.parentNode.classList.contains('carousel-item') )) {
+                            if ( videoClientRect <= ( (windowHeight) - (videoHeight*.8) ) && videoClientRect >= ( 0 - ( videoHeight*.2 ) ) ) {
+                                thisVideoEl.play();
+                            } else {
+                                thisVideoEl.pause();
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+    
+</body><grammarly-desktop-integration data-grammarly-shadow-root="true"><template shadowrootmode="open"><style>
+      div.grammarly-desktop-integration {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select:none;
+        user-select:none;
+      }
+
+      div.grammarly-desktop-integration:before {
+        content: attr(data-content);
+      }
+    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration></html>
